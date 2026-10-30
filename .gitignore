@@ -1,0 +1,26 @@
+node_modules/
+**/node_modules/
+dist/
+coverage/
+.vite/
+.env
+.env.*
+
+# Local credentials and private keys
+**/secrets/
+**/credentials/
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Local database files may contain personal data
+*.db
+*.sqlite
+*.sqlite3
+
+*.log
+.DS_Store
