@@ -194,6 +194,25 @@ test("revoked refresh sessions cannot be used", async () => {
   await assert.rejects(service.refresh(credentials.refreshToken), /replay detected/);
 });
 
+test("refresh ensures default categories exist for existing accounts", async () => {
+  const categoryUpdates = [];
+  const CategoryModel = {
+    async updateOne(filter, update, options) {
+      categoryUpdates.push({ filter, update, options });
+    },
+  };
+  const { service } = makeService({ CategoryModel });
+  const credentials = await service.register(firstUserInput);
+  categoryUpdates.length = 0;
+
+  await service.refresh(credentials.refreshToken);
+
+  assert.equal(categoryUpdates.length, 5);
+  assert.ok(categoryUpdates.every(({ filter }) => filter.userId === credentials.user.id));
+  assert.ok(categoryUpdates.every(({ filter }) => filter.type === "expense"));
+  assert.ok(categoryUpdates.every(({ update }) => update.$setOnInsert.isArchived === false));
+});
+
 test("refresh rotation rejects replay and revokes remaining sessions for only that user", async () => {
   const { service, RefreshSessionModel, sessions } = makeService();
   const firstLogin = await service.register(firstUserInput);

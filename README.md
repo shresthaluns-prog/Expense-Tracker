@@ -96,7 +96,7 @@ npm --prefix client run preview
 
 The backend suite includes Supertest API integration tests and existing model/service tests. The client suite uses Vitest, jsdom, and React Testing Library. Tests cover authentication and refresh rotation, logout and session revocation, rate limiting, CORS and cookie attributes, CRUD, invalid input/IDs, pagination and date boundaries, budget calculations, analytics, cross-user access, frontend validation, protected routes, and memory-only token handling.
 
-New users receive Food, Rent, Entertainment, Education, and Miscellaneous as expense categories. Existing users receive any missing defaults at login; to seed every account in the configured database immediately, run `npm --prefix server run seed:categories`. The seed operation is idempotent and preserves existing categories and income categories.
+New users receive Food, Rent, Entertainment, Education, and Miscellaneous as expense categories. Existing users receive any missing defaults at login or refresh; to seed every account in the configured database immediately, run `npm --prefix server run seed:categories`. The seed operation is idempotent and preserves existing categories and income categories.
 
 New registration passwords must contain at least eight characters with uppercase, lowercase, a number, a special character, and no whitespace. Existing passwords are still accepted by the login endpoint. The default currency for new transactions, budgets, and display preferences is NPR, shown with the `Rs.` prefix; financial records keep their own currency and are never converted.
 

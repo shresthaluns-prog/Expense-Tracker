@@ -158,6 +158,8 @@ export function createAuthService({
       throw new AuthError("Refresh token is invalid or expired.");
     }
 
+    await ensureDefaultExpenseCategories(CategoryModel, user._id);
+
     const { token: nextToken, session: nextSession } = await createRefreshSession(user._id);
     let rotated;
     try {
