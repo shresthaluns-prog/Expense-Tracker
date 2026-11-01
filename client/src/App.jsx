@@ -8,6 +8,7 @@ import TransactionsPage from "./features/expenses/TransactionsPage.jsx";
 import SettingsPage from "./features/settings/SettingsPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import WorkspaceSnapshot from "./components/WorkspaceSnapshot.jsx";
+import { Modal, secondaryButtonClass } from "./components/ui.jsx";
 
 const ReportsPage = lazy(() => import("./features/reports/ReportsPage.jsx"));
 
@@ -24,6 +25,7 @@ function App() {
   const { user, status, logout, logoutEverywhere } = useAuth();
   const [logoutError, setLogoutError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [confirmSidebarSignOut, setConfirmSidebarSignOut] = useState(false);
   const location = useLocation();
 
   async function handleLogout(logoutAction) {
@@ -106,7 +108,7 @@ function App() {
             <button
               aria-label="Sign out"
               className="account-logout"
-              onClick={() => void handleLogout(logout)}
+              onClick={() => setConfirmSidebarSignOut(true)}
               title="Sign out"
               type="button"
             >
@@ -174,6 +176,29 @@ function App() {
           </main>
         </div>
       </div>
+      {confirmSidebarSignOut && (
+        <Modal
+          description="You will need to sign in again to access your account."
+          onClose={() => setConfirmSidebarSignOut(false)}
+          title="Sign out?"
+        >
+          <div className="flex justify-end gap-2">
+            <button className={`${secondaryButtonClass} signout-confirm-button h-10 w-28 justify-center`} onClick={() => setConfirmSidebarSignOut(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="signout-confirm-button inline-flex h-10 w-28 items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 font-medium text-rose-700 transition hover:bg-rose-50"
+              onClick={() => {
+                setConfirmSidebarSignOut(false);
+                void handleLogout(logout);
+              }}
+              type="button"
+            >
+              Sign out
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

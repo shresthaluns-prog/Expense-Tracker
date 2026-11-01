@@ -368,6 +368,9 @@ textarea:focus-visible {
 }
 
 .workspace-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   width: min(560px, calc(100vw - 28px));
   max-width: none;
   max-height: min(90vh, 760px);
@@ -431,6 +434,11 @@ textarea:focus-visible {
 
 .workspace-dialog-content {
   padding: 18px 22px 22px;
+}
+
+.signout-confirm-button {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
 }
 
 .app-content > * {

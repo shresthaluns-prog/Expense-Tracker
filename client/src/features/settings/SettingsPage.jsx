@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../auth/AuthProvider.jsx";
-import { buttonClass, inputClass, Notice, PageHeading, Panel, secondaryButtonClass } from "../../components/ui.jsx";
+import { buttonClass, inputClass, Modal, Notice, PageHeading, Panel, secondaryButtonClass } from "../../components/ui.jsx";
 import {
   getDefaultPreferences,
   loadPreferences,
@@ -17,6 +17,7 @@ function SettingsPage() {
   const [preferences, setPreferences] = useState(loadPreferences);
   const [notice, setNotice] = useState(null);
   const [sessionError, setSessionError] = useState("");
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const form = useForm({
     resolver: zodResolver(preferencesSchema),
     defaultValues: preferences,
@@ -147,7 +148,7 @@ function SettingsPage() {
               </p>
               <button
                 className="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50"
-                onClick={() => void signOut()}
+                onClick={() => setConfirmSignOut(true)}
                 type="button"
               >
                 Sign out
@@ -157,6 +158,29 @@ function SettingsPage() {
 
         </div>
       </div>
+      {confirmSignOut && (
+        <Modal
+          description="You will need to sign in again to access your account."
+          onClose={() => setConfirmSignOut(false)}
+          title="Sign out?"
+        >
+          <div className="flex justify-end gap-2">
+            <button className={`${secondaryButtonClass} signout-confirm-button h-10 w-28 justify-center`} onClick={() => setConfirmSignOut(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="signout-confirm-button inline-flex h-10 w-28 items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 font-medium text-rose-700 transition hover:bg-rose-50"
+              onClick={() => {
+                setConfirmSignOut(false);
+                void signOut();
+              }}
+              type="button"
+            >
+              Sign out
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
