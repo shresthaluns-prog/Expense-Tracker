@@ -258,8 +258,8 @@ function DashboardPage() {
       ) : reportQuery.isSuccess ? (
         <>
           <section aria-label={`Financial summary in ${selectedCurrency}`} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
-            <SummaryCard label="Income" value={formatMoney(summary.incomeMinor, selectedCurrency)} detail={`${incomeCount} income transactions`} tone="emerald" />
-            <SummaryCard label="Expenses" value={formatMoney(summary.expensesMinor, selectedCurrency)} detail={`${expenseCount} expense transactions`} tone="indigo" />
+            <SummaryCard className="summary-card--tall" label="Income" value={formatMoney(summary.incomeMinor, selectedCurrency)} detail={`${incomeCount} income transactions`} tone="emerald" />
+            <SummaryCard className="summary-card--tall" label="Expenses" value={formatMoney(summary.expensesMinor, selectedCurrency)} detail={`${expenseCount} expense transactions`} tone="red" />
           </section>
 
           <section aria-label="Spending charts" className="dashboard-analytics-grid grid gap-4 xl:grid-cols-[1.48fr_1fr_1.12fr]">
@@ -302,15 +302,16 @@ function DashboardPage() {
   );
 }
 
-function SummaryCard({ label, value, detail, tone }) {
+function SummaryCard({ className = "", label, value, detail, tone }) {
   const accents = {
     emerald: "metric-teal",
     indigo: "metric-blue",
     rose: "metric-violet",
+    red: "metric-red",
     slate: "metric-cyan",
   };
   return (
-    <article className={`metric-card ${accents[tone]}`}>
+    <article className={`metric-card ${accents[tone]} ${className}`.trim()}>
       <span aria-hidden="true" className="metric-icon">{label === "Income" ? "↗" : label === "Expenses" ? "↓" : label === "Net cash flow" ? "⌁" : "%"}</span>
       <h2>{label}</h2>
       <p className="metric-value">{value}</p>
