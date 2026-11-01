@@ -791,7 +791,6 @@ textarea:focus-visible {
 }
 
 .dashboard-chart-panel,
-.dashboard-category-panel,
 .dashboard-recent-panel {
   min-width: 0;
 }
@@ -802,10 +801,6 @@ textarea:focus-visible {
 
 .dashboard-analytics-grid .ui-panel > div:first-child {
   margin-bottom: 12px;
-}
-
-.dashboard-category-panel > div:last-child > div:first-child {
-  height: 220px !important;
 }
 
 .dashboard-recent-panel li {
@@ -834,9 +829,6 @@ textarea:focus-visible {
     height: 242px !important;
   }
 
-  .dashboard-category-panel > div:last-child > div:first-child {
-    height: 190px !important;
-  }
 }
 
 @media (max-width: 1100px) {
@@ -1048,10 +1040,6 @@ textarea:focus-visible {
 
   .dashboard-chart-panel > div:last-child > div {
     height: 255px !important;
-  }
-
-  .dashboard-category-panel > div:last-child > div:first-child {
-    height: 225px !important;
   }
 
   .dashboard-date-form {

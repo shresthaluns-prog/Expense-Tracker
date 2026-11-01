@@ -29,9 +29,6 @@ import {
 const CashFlowChart = lazy(() =>
   import("./DashboardCharts.jsx").then((module) => ({ default: module.CashFlowChart })),
 );
-const CategoryDoughnut = lazy(() =>
-  import("./DashboardCharts.jsx").then((module) => ({ default: module.CategoryDoughnut })),
-);
 
 const quickTransactionSchema = z.object({
   type: z.enum(["expense", "income"]),
@@ -107,9 +104,6 @@ function DashboardPage() {
   const trendData = useMemo(
     () => createTrendChartData(report?.trends ?? [], monthKeys, selectedCurrency),
     [report?.trends, monthKeys, selectedCurrency],
-  );
-  const categoryData = (report?.categories ?? []).filter(
-    (category) => category.currency === selectedCurrency,
   );
   const budgets = (report?.budgets ?? []).filter(
     (budget) => budget.currency === selectedCurrency,
@@ -190,15 +184,10 @@ function DashboardPage() {
             <SummaryCard className="summary-card--tall" label="Expenses" value={formatMoney(summary.expensesMinor, selectedCurrency)} detail={`${expenseCount} expense transactions`} tone="red" />
           </section>
 
-          <section aria-label="Spending charts" className="dashboard-analytics-grid grid gap-4 xl:grid-cols-[1.48fr_1fr_1.12fr]">
+          <section aria-label="Cash flow and recent transactions" className="dashboard-analytics-grid grid gap-4 xl:grid-cols-2">
             <Panel className="dashboard-chart-panel" title="Cash flow" description={`Monthly income and expenses · ${selectedCurrency}`}>
               <Suspense fallback={<LoadingState label="Loading chart…" />}>
                 <CashFlowChart currency={selectedCurrency} data={trendData} />
-              </Suspense>
-            </Panel>
-            <Panel className="dashboard-category-panel" title="Spending by category" description={`Expense totals · ${selectedCurrency}`}>
-              <Suspense fallback={<LoadingState label="Loading chart…" />}>
-                <CategoryDoughnut categories={categoryData} currency={selectedCurrency} />
               </Suspense>
             </Panel>
             <RecentTransactions
