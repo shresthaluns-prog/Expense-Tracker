@@ -79,7 +79,11 @@ textarea:focus-visible {
 }
 
 .app-sidebar {
+  position: sticky;
+  top: 14px;
   display: flex;
+  align-self: start;
+  height: calc(100vh - 28px);
   min-width: 0;
   flex-direction: column;
   padding: 22px 14px 14px;
@@ -922,6 +926,7 @@ textarea:focus-visible {
     top: 0;
     bottom: 0;
     left: 0;
+    height: auto;
     width: min(82vw, 290px);
     padding: 20px 15px 14px;
     border-right: 1px solid #dfeaec;

@@ -68,71 +68,77 @@ function SettingsPage() {
       {sessionError && <Notice>{sessionError}</Notice>}
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <Panel title="Display and reports" description="These preferences are saved in this browser only.">
-          <form
-            className="space-y-5"
-            onSubmit={form.handleSubmit((values) => {
-              setNotice(null);
-              saveMutation.mutate(values);
-            })}
-          >
-            <label className="block text-sm font-medium text-slate-700">
-              Preferred currency
-              <input
-                autoCapitalize="characters"
-                className={`${inputClass} uppercase`}
-                maxLength={3}
-                placeholder="NPR"
-                {...form.register("currency", { setValueAs: (value) => value.toUpperCase() })}
-              />
-              <span className="mt-1 block text-xs font-normal text-slate-500">
-                Financial records retain their own currency. Reports keep currencies separate and will not convert totals.
-              </span>
-              {form.formState.errors.currency && (
-                <span className="mt-1 block text-xs text-rose-700">{form.formState.errors.currency.message}</span>
-              )}
-            </label>
+        <div className="space-y-6">
+          <Panel title="Display and reports" description="These preferences are saved in this browser only.">
+            <form
+              className="space-y-5"
+              onSubmit={form.handleSubmit((values) => {
+                setNotice(null);
+                saveMutation.mutate(values);
+              })}
+            >
+              <label className="block text-sm font-medium text-slate-700">
+                Preferred currency
+                <input
+                  autoCapitalize="characters"
+                  className={`${inputClass} uppercase`}
+                  maxLength={3}
+                  placeholder="NPR"
+                  {...form.register("currency", { setValueAs: (value) => value.toUpperCase() })}
+                />
+                <span className="mt-1 block text-xs font-normal text-slate-500">
+                  Financial records retain their own currency. Reports keep currencies separate and will not convert totals.
+                </span>
+                {form.formState.errors.currency && (
+                  <span className="mt-1 block text-xs text-rose-700">{form.formState.errors.currency.message}</span>
+                )}
+              </label>
 
-            <label className="block text-sm font-medium text-slate-700">
-              Reporting timezone
-              <input
-                autoComplete="off"
-                className={inputClass}
-                list="expense-tracker-timezones"
-                placeholder="e.g. Asia/Kathmandu"
-                {...form.register("timezone")}
-              />
-              <datalist id="expense-tracker-timezones">
-                {[preferences.timezone, "UTC", "Asia/Kathmandu", "America/Los_Angeles", "America/New_York", "Europe/London", "Europe/Paris", "Asia/Tokyo"].map((timezone) => (
-                  <option key={timezone} value={timezone} />
-                ))}
-              </datalist>
-              <span className="mt-1 block text-xs font-normal text-slate-500">
-                Use an IANA timezone, such as Asia/Kathmandu. Report date boundaries follow this timezone, including daylight-saving changes.
-              </span>
-              {form.formState.errors.timezone && (
-                <span className="mt-1 block text-xs text-rose-700">{form.formState.errors.timezone.message}</span>
-              )}
-            </label>
+              <label className="block text-sm font-medium text-slate-700">
+                Reporting timezone
+                <input
+                  autoComplete="off"
+                  className={inputClass}
+                  list="expense-tracker-timezones"
+                  placeholder="e.g. Asia/Kathmandu"
+                  {...form.register("timezone")}
+                />
+                <datalist id="expense-tracker-timezones">
+                  {[preferences.timezone, "UTC", "Asia/Kathmandu", "America/Los_Angeles", "America/New_York", "Europe/London", "Europe/Paris", "Asia/Tokyo"].map((timezone) => (
+                    <option key={timezone} value={timezone} />
+                  ))}
+                </datalist>
+                <span className="mt-1 block text-xs font-normal text-slate-500">
+                  Use an IANA timezone, such as Asia/Kathmandu. Report date boundaries follow this timezone, including daylight-saving changes.
+                </span>
+                {form.formState.errors.timezone && (
+                  <span className="mt-1 block text-xs text-rose-700">{form.formState.errors.timezone.message}</span>
+                )}
+              </label>
 
-            <div className="flex flex-wrap gap-2">
-              <button className={buttonClass} disabled={saveMutation.isPending} type="submit">
-                {saveMutation.isPending ? "Saving…" : "Save preferences"}
-              </button>
-              <button
-                className={secondaryButtonClass}
-                onClick={() => {
-                  const defaults = getDefaultPreferences();
-                  reset(defaults);
-                  setNotice(null);
-                }}
-                type="button"
-              >
-                Use browser defaults
-              </button>
-            </div>
-          </form>
-        </Panel>
+              <div className="flex flex-wrap gap-2">
+                <button className={buttonClass} disabled={saveMutation.isPending} type="submit">
+                  {saveMutation.isPending ? "Saving…" : "Save preferences"}
+                </button>
+                <button
+                  className={secondaryButtonClass}
+                  onClick={() => {
+                    const defaults = getDefaultPreferences();
+                    reset(defaults);
+                    setNotice(null);
+                  }}
+                  type="button"
+                >
+                  Use browser defaults
+                </button>
+              </div>
+            </form>
+          </Panel>
+
+          <p className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+            Access tokens remain in memory and are never saved to browser storage. Only your display preferences are kept in local browser storage; refresh credentials stay in secure cookies managed by the server.
+          </p>
+        </div>
 
         <div className="space-y-6">
           <Panel title="Account profile" description="Profile information associated with this signed-in account.">
@@ -161,9 +167,6 @@ function SettingsPage() {
             </div>
           </Panel>
 
-          <p className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-            Access tokens remain in memory and are never saved to browser storage. Only your display preferences are kept in local browser storage; refresh credentials stay in secure cookies managed by the server.
-          </p>
         </div>
       </div>
     </div>
