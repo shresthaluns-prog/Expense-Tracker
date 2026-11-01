@@ -144,11 +144,13 @@ function App() {
               <p>{location.pathname === "/" ? `Welcome back, ${user.name}. Here’s your financial overview.` : "Manage your personal finances."}</p>
             </div>
             <div className="topbar-actions">
-              <Link className="topbar-search" to="/transactions" aria-label="Search transactions">
-                <NavIcon name="search" />
-                <span>Search transactions</span>
-                <kbd>/</kbd>
-              </Link>
+              {location.pathname !== "/" && (
+                <Link className="topbar-search" to="/transactions" aria-label="Search transactions">
+                  <NavIcon name="search" />
+                  <span>Search transactions</span>
+                  <kbd>/</kbd>
+                </Link>
+              )}
               <Link aria-label="Account settings" className="topbar-profile" to="/settings">
                 <span aria-hidden="true" className="account-avatar">{user.name?.slice(0, 1).toUpperCase() ?? "U"}</span>
               </Link>

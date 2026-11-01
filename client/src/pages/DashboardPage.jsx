@@ -12,7 +12,6 @@ import {
   LoadingState,
   Notice,
   Panel,
-  secondaryButtonClass,
 } from "../components/ui.jsx";
 import { listCategories } from "../features/categories/categoriesApi.js";
 import { listTransactions } from "../features/expenses/transactionsApi.js";
@@ -25,7 +24,6 @@ import {
   getCurrentMonthRange,
   getDateInTimezone,
   getMonthKeys,
-  inclusiveRangeLength,
 } from "./dashboard-data.js";
 
 const CashFlowChart = lazy(() =>
@@ -60,13 +58,11 @@ function quickFormDefaults(currency, timezone) {
 function DashboardPage() {
   const queryClient = useQueryClient();
   const [preferences, setPreferences] = useState(loadPreferences);
-  const [range, setRange] = useState(() => getCurrentMonthRange(loadPreferences().timezone));
-  const [appliedRange, setAppliedRange] = useState(() => ({
-    ...getCurrentMonthRange(loadPreferences().timezone),
-    timezone: loadPreferences().timezone,
-  }));
+  const appliedRange = useMemo(
+    () => ({ ...getCurrentMonthRange(preferences.timezone), timezone: preferences.timezone }),
+    [preferences.timezone],
+  );
   const [selectedCurrency, setSelectedCurrency] = useState(() => loadPreferences().currency);
-  const [rangeError, setRangeError] = useState("");
   const [formError, setFormError] = useState("");
 
   const reportQuery = useQuery({
@@ -93,10 +89,6 @@ function DashboardPage() {
     [categoriesQuery.data, transactionType],
   );
   const report = reportQuery.data;
-  const currencies = useMemo(
-    () => [...new Set([preferences.currency, ...(report?.totals ?? []).map(({ currency }) => currency)])],
-    [preferences.currency, report],
-  );
   const currencyTotals = (report?.totals ?? []).find((row) => row.currency === selectedCurrency);
   const currencySummary = (report?.summary ?? []).filter((row) => row.currency === selectedCurrency);
   const incomeCount = currencySummary.find((row) => row.type === "income")?.transactionCount ?? 0;
@@ -130,9 +122,6 @@ function DashboardPage() {
   useEffect(() => subscribeToPreferences((next) => {
     setPreferences(next);
     setSelectedCurrency(next.currency);
-    const nextRange = getCurrentMonthRange(next.timezone);
-    setRange(nextRange);
-    setAppliedRange({ ...nextRange, timezone: next.timezone });
     reset(quickFormDefaults(next.currency, next.timezone));
   }), [reset]);
 
@@ -173,21 +162,6 @@ function DashboardPage() {
     onError: (error) => setFormError(error.message),
   });
 
-  function applyDateRange(event) {
-    event.preventDefault();
-    const days = inclusiveRangeLength(range.startDate, range.endDate);
-    if (days === null) {
-      setRangeError("End date must be on or after the start date.");
-      return;
-    }
-    if (days > 366) {
-      setRangeError("Choose a date range of 366 days or less.");
-      return;
-    }
-    setRangeError("");
-    setAppliedRange({ ...range, timezone: preferences.timezone });
-  }
-
   function submitQuickTransaction(values) {
     setFormError("");
     createMutation.mutate(values);
@@ -201,56 +175,10 @@ function DashboardPage() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Your money, in focus</p>
           <p className="mt-1 text-sm text-slate-500">
-            Income, spending, and budget progress for your selected period.
+            Income, spending, and budget progress for the current month.
           </p>
         </div>
-        <Link className={secondaryButtonClass} to="/reports">Open full reports →</Link>
       </header>
-
-      <Panel className="dashboard-date-panel" title="Reporting period" description={`Dates use ${preferences.timezone}.`}>
-        <form className="dashboard-date-form flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={applyDateRange}>
-          <label className="block text-sm font-medium text-slate-700">
-            From
-            <input
-              aria-label="Dashboard start date"
-              className={inputClass}
-              max={range.endDate || undefined}
-              required
-              type="date"
-              value={range.startDate}
-              onChange={(event) => setRange({ ...range, startDate: event.target.value })}
-            />
-          </label>
-          <label className="block text-sm font-medium text-slate-700">
-            Through
-            <input
-              aria-label="Dashboard end date"
-              className={inputClass}
-              min={range.startDate || undefined}
-              required
-              type="date"
-              value={range.endDate}
-              onChange={(event) => setRange({ ...range, endDate: event.target.value })}
-            />
-          </label>
-          <button className={buttonClass} type="submit">Apply dates</button>
-          <label className="block text-sm font-medium text-slate-700 sm:ml-auto">
-            Currency
-            <select
-              aria-label="Dashboard currency"
-              className={inputClass}
-              onChange={(event) => {
-                setSelectedCurrency(event.target.value);
-                form.setValue("currency", event.target.value, { shouldValidate: true });
-              }}
-              value={selectedCurrency}
-            >
-              {currencies.map((currency) => <option key={currency} value={currency}>{currency}</option>)}
-            </select>
-          </label>
-        </form>
-        {rangeError && <div className="mt-3"><Notice>{rangeError}</Notice></div>}
-      </Panel>
 
       {reportQuery.isError && <Notice>{reportQuery.error.message}</Notice>}
       {reportQuery.isPending ? (
