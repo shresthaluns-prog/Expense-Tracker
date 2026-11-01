@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
@@ -257,11 +257,9 @@ function DashboardPage() {
         <Panel><LoadingState label="Loading dashboard analytics…" /></Panel>
       ) : reportQuery.isSuccess ? (
         <>
-          <section aria-label={`Financial summary in ${selectedCurrency}`} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <section aria-label={`Financial summary in ${selectedCurrency}`} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
             <SummaryCard label="Income" value={formatMoney(summary.incomeMinor, selectedCurrency)} detail={`${incomeCount} income transactions`} tone="emerald" />
             <SummaryCard label="Expenses" value={formatMoney(summary.expensesMinor, selectedCurrency)} detail={`${expenseCount} expense transactions`} tone="indigo" />
-            <SummaryCard label="Net cash flow" value={formatMoney(summary.netCashFlowMinor, selectedCurrency)} detail={summary.netCashFlowMinor < 0 ? "Spending exceeded income" : "Income less expenses"} tone={summary.netCashFlowMinor < 0 ? "rose" : "slate"} />
-            <SummaryCard label="Savings rate" value={`${Number(summary.savingsRate).toFixed(2)}%`} detail={summary.incomeMinor === 0 ? "No income in this period" : "Net cash flow ÷ income"} tone={summary.savingsRate < 0 ? "rose" : "emerald"} />
           </section>
 
           <section aria-label="Spending charts" className="dashboard-analytics-grid grid gap-4 xl:grid-cols-[1.48fr_1fr_1.12fr]">
@@ -463,16 +461,12 @@ function QuickAddTransaction({
             <option value="income">Income</option>
           </select>
         </label>
-        <label className="block text-sm font-medium text-slate-700">
-          Category
-          <select className={inputClass} {...form.register("categoryId")} disabled={categoriesPending || availableCategories.length === 0}>
-            <option value="">Select category</option>
-            {availableCategories.map((category) => (
-              <option key={category._id} value={category._id}>{category.name}</option>
-            ))}
-          </select>
-          {errors.categoryId && <span className="mt-1 block text-xs text-rose-700">{errors.categoryId.message}</span>}
-        </label>
+        <CategoryDropdown
+          categories={availableCategories}
+          disabled={categoriesPending || availableCategories.length === 0}
+          error={errors.categoryId?.message}
+          form={form}
+        />
         <label className="block text-sm font-medium text-slate-700">
           Amount
           <input className={inputClass} inputMode="decimal" placeholder="0.00" {...form.register("amount")} />
@@ -511,6 +505,132 @@ function QuickAddTransaction({
         </div>
       </form>
     </Panel>
+  );
+}
+
+function CategoryDropdown({ categories, disabled, error, form }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedCategoryId = useWatch({ control: form.control, name: "categoryId" });
+  const containerRef = useRef(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
+  const selectedCategory = categories.find((category) => category._id === selectedCategoryId);
+  const labelId = "quick-add-category-label";
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    function closeOnOutsideClick(event) {
+      if (!containerRef.current?.contains(event.target)) setIsOpen(false);
+    }
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    return () => document.removeEventListener("pointerdown", closeOnOutsideClick);
+  }, [isOpen]);
+
+  function closeMenu(restoreFocus = false) {
+    setIsOpen(false);
+    if (restoreFocus) triggerRef.current?.focus();
+  }
+
+  function handleMenuKeyDown(event) {
+    const options = [...(menuRef.current?.querySelectorAll('[role="menuitemradio"]') ?? [])];
+    const currentIndex = options.indexOf(document.activeElement);
+    let nextIndex;
+    if (event.key === "ArrowDown") nextIndex = (currentIndex + 1) % options.length;
+    if (event.key === "ArrowUp") nextIndex = (currentIndex - 1 + options.length) % options.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = options.length - 1;
+    if (nextIndex !== undefined && options.length > 0) {
+      event.preventDefault();
+      options[nextIndex].focus();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu(true);
+    }
+  }
+
+  return (
+    <div
+      className="relative min-w-0 sm:col-span-2 xl:col-span-2"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false);
+      }}
+      ref={containerRef}
+    >
+      <span className="text-sm font-medium text-slate-700" id={labelId}>Category</span>
+      <input type="hidden" {...form.register("categoryId")} />
+      <button
+        aria-controls="quick-add-category-menu"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-labelledby={`${labelId} quick-add-category-value`}
+        className={`${inputClass} flex items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400`}
+        disabled={disabled}
+        onClick={() => setIsOpen((open) => !open)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" && !isOpen) {
+            event.preventDefault();
+            setIsOpen(true);
+            requestAnimationFrame(() => menuRef.current?.querySelector("button")?.focus());
+          }
+        }}
+        ref={triggerRef}
+        type="button"
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          {selectedCategory ? (
+            <>
+              <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: selectedCategory.color }} />
+              <span className="truncate text-slate-900" id="quick-add-category-value">{selectedCategory.name}</span>
+            </>
+          ) : (
+            <span id="quick-add-category-value">{disabled ? "No categories available" : "Select category"}</span>
+          )}
+        </span>
+        <svg aria-hidden="true" className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 20 20" stroke="currentColor">
+          <path d="m5 7.5 5 5 5-5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div
+          aria-labelledby={labelId}
+          className="absolute z-20 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10"
+          id="quick-add-category-menu"
+          onKeyDown={handleMenuKeyDown}
+          ref={menuRef}
+          role="menu"
+        >
+          {categories.map((category) => {
+            const isSelected = category._id === selectedCategoryId;
+            return (
+              <button
+                aria-checked={isSelected}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                  isSelected ? "bg-teal-50 font-semibold text-teal-900" : "text-slate-700 hover:bg-slate-50"
+                }`}
+                key={category._id}
+                onClick={() => {
+                  form.setValue("categoryId", category._id, { shouldDirty: true, shouldValidate: true });
+                  closeMenu(true);
+                }}
+                role="menuitemradio"
+                type="button"
+              >
+                <span
+                  aria-hidden="true"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-bold text-white"
+                  style={{ backgroundColor: category.color }}
+                >
+                  {category.name.trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1 truncate">{category.name}</span>
+                {isSelected && <span aria-hidden="true" className="text-teal-700">✓</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      {error && <span className="mt-1 block text-xs text-rose-700">{error}</span>}
+    </div>
   );
 }
 
