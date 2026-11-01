@@ -20,16 +20,6 @@ const navigation = [
   { to: "/settings", label: "Settings", icon: "settings" },
 ];
 
-const titles = {
-  "/": "Overview",
-  "/transactions": "Transactions",
-  "/budgets": "Budgets",
-  "/reports": "Reports",
-  "/categories": "Categories",
-  "/settings": "Settings",
-  "/auth": "Sign in",
-};
-
 function App() {
   const { user, status, logout, logoutEverywhere } = useAuth();
   const [logoutError, setLogoutError] = useState("");
@@ -139,10 +129,7 @@ function App() {
             >
               <NavIcon name="menu" />
             </button>
-            <div className="topbar-title">
-              <h1>{titles[location.pathname] ?? "Expense Tracker"}</h1>
-              <p>{location.pathname === "/" ? `Welcome back, ${user.name}. Here’s your financial overview.` : "Manage your personal finances."}</p>
-            </div>
+            <p className="topbar-brand-slogan">Small Steps. Smarter Money.</p>
             <div className="topbar-actions">
               <Link aria-label={`Account settings for ${user.name}`} className="topbar-profile" to="/settings">
                 <span aria-hidden="true" className="account-avatar">{user.name?.slice(0, 1).toUpperCase() ?? "U"}</span>

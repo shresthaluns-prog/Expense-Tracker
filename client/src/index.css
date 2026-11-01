@@ -261,26 +261,13 @@ textarea:focus-visible {
   border-bottom: 1px solid rgba(226, 237, 239, 0.7);
 }
 
-.topbar-title {
+.topbar-brand-slogan {
   min-width: 0;
-}
-
-.topbar-title h1 {
   margin: 0;
-  color: var(--ink);
-  font-size: 22px;
-  font-weight: 680;
-  letter-spacing: -0.045em;
-  line-height: 1.2;
-}
-
-.topbar-title p {
-  overflow: hidden;
-  margin: 5px 0 0;
-  color: #72838b;
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #172a35;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.015em;
 }
 
 .topbar-actions {
@@ -985,13 +972,8 @@ textarea:focus-visible {
     backdrop-filter: blur(14px);
   }
 
-  .topbar-title h1 {
-    font-size: 18px;
-  }
-
-  .topbar-title p {
-    max-width: 55vw;
-    font-size: 10px;
+  .topbar-brand-slogan {
+    font-size: 14px;
   }
 
   .topbar-actions {

@@ -13,7 +13,7 @@ import {
 
 function SettingsPage() {
   const queryClient = useQueryClient();
-  const { user, logout, logoutEverywhere } = useAuth();
+  const { user, logout } = useAuth();
   const [preferences, setPreferences] = useState(loadPreferences);
   const [notice, setNotice] = useState(null);
   const [sessionError, setSessionError] = useState("");
@@ -37,15 +37,6 @@ function SettingsPage() {
     reset(preferences);
   }, [preferences, reset]);
 
-  async function signOutAll() {
-    setSessionError("");
-    try {
-      await logoutEverywhere();
-    } catch (error) {
-      setSessionError(error.message);
-    }
-  }
-
   async function signOut() {
     setSessionError("");
     try {
@@ -67,7 +58,7 @@ function SettingsPage() {
       {notice && <Notice tone={notice.tone}>{notice.text}</Notice>}
       {sessionError && <Notice>{sessionError}</Notice>}
 
-      <div className="grid items-start gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid items-stretch gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <Panel title="Display and reports" description="These preferences are saved in this browser only.">
             <form
@@ -140,7 +131,7 @@ function SettingsPage() {
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Panel title="Account profile" description="Profile information associated with this signed-in account.">
             <dl className="divide-y divide-slate-100">
               <ProfileRow label="Name" value={user?.name || "—"} />
@@ -149,20 +140,17 @@ function SettingsPage() {
             </dl>
           </Panel>
 
-          <Panel title="Sessions" description="Sign out here or revoke refresh sessions on all devices.">
+          <Panel className="flex-1" title="Sessions" description="Sign out of your current session.">
             <div className="flex flex-col items-start gap-3">
               <p className="text-sm leading-6 text-slate-500">
-                Signing out everywhere invalidates your refresh sessions. Other devices will need to sign in again.
+                Sign out of this account on the current device.
               </p>
-              <button className={secondaryButtonClass} onClick={() => void signOut()} type="button">
-                Sign out
-              </button>
               <button
                 className="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50"
-                onClick={() => void signOutAll()}
+                onClick={() => void signOut()}
                 type="button"
               >
-                Sign out all devices
+                Sign out
               </button>
             </div>
           </Panel>

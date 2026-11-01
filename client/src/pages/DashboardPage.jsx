@@ -161,6 +161,7 @@ function DashboardPage() {
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Your money, in focus</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Overview</h1>
           <p className="mt-1 text-sm text-slate-500">
             Income, spending, and budget progress for the current month.
           </p>
