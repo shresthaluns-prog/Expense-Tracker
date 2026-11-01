@@ -179,7 +179,7 @@ function ReportsPage() {
             />
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <div className="grid gap-6 xl:grid-cols-2">
             <Panel title="Income vs. expenses" description={`Monthly totals in ${selectedCurrency}; months without transactions are shown as zero.`}>
               {trend.some((month) => month.incomeMinor || month.expenseMinor) ? (
                 <div className="h-80 w-full">

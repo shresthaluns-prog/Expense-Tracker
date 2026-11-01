@@ -20,7 +20,6 @@ import { loadPreferences, subscribeToPreferences } from "../features/settings/pr
 import { amountToMinor, formatMoney } from "../utils/money.js";
 import {
   createTrendChartData,
-  getBudgetProgressLabel,
   getCurrentMonthRange,
   getDateInTimezone,
   getMonthKeys,
@@ -105,13 +104,7 @@ function DashboardPage() {
     () => createTrendChartData(report?.trends ?? [], monthKeys, selectedCurrency),
     [report?.trends, monthKeys, selectedCurrency],
   );
-  const budgets = (report?.budgets ?? []).filter(
-    (budget) => budget.currency === selectedCurrency,
-  );
   const recentTransactions = recentQuery.data?.data ?? [];
-  const categoryNames = new Map(
-    (report?.categoryTotals ?? []).map((category) => [String(category.categoryId), category.name]),
-  );
 
   useEffect(() => subscribeToPreferences((next) => {
     setPreferences(next);
@@ -199,8 +192,7 @@ function DashboardPage() {
               transactions={recentTransactions}
             />
           </section>
-          <section aria-label="Budget progress and quick transaction" className="dashboard-bottom-grid grid items-start gap-4 xl:grid-cols-[0.85fr_1.5fr]">
-            <BudgetProgress budgets={budgets} categoryNames={categoryNames} />
+          <section aria-label="Quick transaction" className="dashboard-bottom-grid grid items-start gap-4">
             <QuickAddTransaction
               availableCategories={availableCategories}
               categoriesError={categoriesQuery.error}
@@ -278,69 +270,6 @@ function RecentTransactions({ className = "", error, isError, isPending, timezon
                 <span className={`shrink-0 text-sm font-semibold ${income ? "text-emerald-700" : "text-slate-800"}`}>
                   {income ? "+" : "−"}{formatMoney(transaction.amountMinor, transaction.currency)}
                 </span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </Panel>
-  );
-}
-
-function BudgetProgress({ budgets, categoryNames }) {
-  return (
-    <Panel
-      title="Budget progress"
-      description="Budgets overlapping the selected dates; spend uses each budget's full period."
-      action={<Link className="text-sm font-semibold text-indigo-700 hover:text-indigo-900" to="/budgets">Manage →</Link>}
-    >
-      {budgets.length === 0 ? (
-        <EmptyState title="No budgets for this selection" description="Create a matching budget to track spending progress here." />
-      ) : (
-        <ul className="space-y-5">
-          {budgets.map((budget) => {
-            const percent = Number(budget.percentageUsed) || 0;
-            const categoryName = budget.categoryId ? categoryNames.get(String(budget.categoryId)) : null;
-            const label = categoryName ?? (budget.categoryId ? "Category budget" : "Overall budget");
-            const isOver = budget.status === "over_budget";
-            const isWarning = budget.status === "warning";
-            return (
-              <li key={budget._id}>
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800">{label}</p>
-                    <p className="mt-0.5 text-xs capitalize text-slate-500">
-                      {budget.periodType} · {formatMoney(budget.spentMinor, budget.currency)} of {formatMoney(budget.amountMinor, budget.currency)}
-                    </p>
-                  </div>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${isOver ? "bg-rose-50 text-rose-700" : isWarning ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>
-                    {getBudgetProgressLabel(budget)}
-                  </span>
-                </div>
-                <div
-                  aria-label={`${label}: ${percent.toFixed(2)} percent used`}
-                  aria-valuemax={100}
-                  aria-valuemin={0}
-                  aria-valuenow={Math.min(Math.max(percent, 0), 100)}
-                  className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"
-                  role="progressbar"
-                >
-                  <div
-                    className={`h-full rounded-full transition-all ${isOver ? "bg-rose-500" : isWarning ? "bg-amber-500" : "bg-emerald-500"}`}
-                    style={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
-                  />
-                </div>
-                <div className="mt-1 flex justify-between gap-2 text-xs text-slate-500">
-                  <span>{percent.toFixed(2)}% used</span>
-                  <span>{formatMoney(budget.remainingMinor, budget.currency)} remaining</span>
-                </div>
-                {(isOver || isWarning) && (
-                  <p className={`mt-2 text-xs font-medium ${isOver ? "text-rose-700" : "text-amber-700"}`} role="status">
-                    {isOver
-                      ? `Over limit by ${formatMoney(Math.abs(budget.remainingMinor), budget.currency)}.`
-                      : "You have used at least 80% of this budget."}
-                  </p>
-                )}
               </li>
             );
           })}
