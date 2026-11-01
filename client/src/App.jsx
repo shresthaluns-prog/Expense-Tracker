@@ -144,22 +144,16 @@ function App() {
               <p>{location.pathname === "/" ? `Welcome back, ${user.name}. Here’s your financial overview.` : "Manage your personal finances."}</p>
             </div>
             <div className="topbar-actions">
-              {location.pathname !== "/" && (
-                <Link className="topbar-search" to="/transactions" aria-label="Search transactions">
-                  <NavIcon name="search" />
-                  <span>Search transactions</span>
-                  <kbd>/</kbd>
-                </Link>
-              )}
-              <Link aria-label="Account settings" className="topbar-profile" to="/settings">
+              <Link aria-label={`Account settings for ${user.name}`} className="topbar-profile" to="/settings">
                 <span aria-hidden="true" className="account-avatar">{user.name?.slice(0, 1).toUpperCase() ?? "U"}</span>
+                <span className="topbar-profile-name">{user.name}</span>
               </Link>
             </div>
           </header>
 
           <main className="app-content">
             {logoutError && <p className="app-notice" role="alert">{logoutError}</p>}
-            {location.pathname !== "/" && <WorkspaceSnapshot />}
+            {location.pathname !== "/" && location.pathname !== "/settings" && <WorkspaceSnapshot />}
             <Routes>
               <Route element={<DashboardPage />} path="/" />
               <Route element={<TransactionsPage />} path="/transactions" />

@@ -281,51 +281,31 @@ textarea:focus-visible {
 
 .topbar-actions {
   display: flex;
+  align-self: stretch;
   align-items: center;
   gap: 12px;
 }
 
-.topbar-search {
-  display: flex;
-  width: min(260px, 28vw);
-  height: 36px;
-  align-items: center;
-  gap: 9px;
-  padding: 0 10px;
-  border: 1px solid #e1eaec;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #829098;
-  font-size: 10px;
-  text-decoration: none;
-}
-
-.topbar-search:hover {
-  border-color: #b6dcdc;
-  color: #087c80;
-}
-
-.topbar-search .nav-icon {
-  width: 15px;
-  height: 15px;
-}
-
-.topbar-search span {
-  flex: 1;
-}
-
-.topbar-search kbd {
-  padding: 1px 5px;
-  border: 1px solid #e4ebed;
-  border-radius: 4px;
-  background: #f7fafb;
-  color: #9ba8ad;
-  font: inherit;
-}
-
 .topbar-profile {
   display: inline-flex;
+  min-height: 36px;
+  align-self: center;
+  align-items: center;
+  gap: 9px;
+  color: #52646d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   text-decoration: none;
+}
+
+.topbar-profile-name {
+  display: flex;
+  align-items: center;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-content {
@@ -985,23 +965,13 @@ textarea:focus-visible {
     gap: 7px;
   }
 
-  .topbar-search {
-    width: 35px;
-    height: 35px;
-    justify-content: center;
-    padding: 0;
-    border: 0;
-    background: #eaf5f5;
-  }
-
-  .topbar-search span,
-  .topbar-search kbd {
-    display: none;
-  }
-
   .topbar-profile .account-avatar {
     width: 31px;
     height: 31px;
+  }
+
+  .topbar-profile-name {
+    max-width: 120px;
   }
 
   .app-content {
