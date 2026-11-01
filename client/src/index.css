@@ -317,9 +317,36 @@ textarea:focus-visible {
 
 .workspace-snapshot {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 20px;
+}
+
+.workspace-snapshot--summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workspace-snapshot--summary .summary-card--tall {
+  min-height: 200px;
+  padding: 16px;
+}
+
+.workspace-snapshot--report .summary-card--tall {
+  min-height: 150px;
+  grid-template-rows: 30px 1fr auto;
+  padding: 13px 15px;
+}
+
+.workspace-snapshot--report .summary-card--tall h2 {
+  font-size: 13px;
+}
+
+.workspace-snapshot--report .summary-card--tall .metric-value {
+  font-size: clamp(26px, 2.4vw, 36px);
+}
+
+.workspace-snapshot--report .summary-card--tall .metric-detail {
+  font-size: 9px;
 }
 
 .workspace-snapshot-card {
@@ -737,6 +764,11 @@ textarea:focus-visible {
   color: #3982d7;
 }
 
+.metric-blue {
+  border-color: rgba(57, 130, 215, 0.35);
+  background: rgba(244, 249, 255, 0.96);
+}
+
 .metric-red {
   border-color: rgba(214, 77, 77, 0.38);
   background: rgba(255, 245, 245, 0.96);
@@ -847,6 +879,10 @@ textarea:focus-visible {
 
   .workspace-snapshot {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workspace-snapshot--summary {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .dashboard-analytics-grid {
@@ -975,6 +1011,10 @@ textarea:focus-visible {
     margin-bottom: 16px;
   }
 
+  .workspace-snapshot--summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .workspace-snapshot-card {
     gap: 5px;
     padding: 11px 12px;
@@ -1007,6 +1047,11 @@ textarea:focus-visible {
   .metric-card {
     min-height: 96px;
     padding: 14px 10px 12px 53px;
+  }
+
+  .workspace-snapshot--report .summary-card--tall {
+    min-height: 150px;
+    padding: 13px;
   }
 
   .metric-icon {

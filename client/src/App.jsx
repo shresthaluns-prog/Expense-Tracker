@@ -153,7 +153,12 @@ function App() {
 
           <main className="app-content">
             {logoutError && <p className="app-notice" role="alert">{logoutError}</p>}
-            {location.pathname !== "/" && location.pathname !== "/settings" && <WorkspaceSnapshot />}
+            {location.pathname !== "/" && location.pathname !== "/settings" && location.pathname !== "/categories" && (
+              <WorkspaceSnapshot
+                compact={location.pathname === "/transactions" || location.pathname === "/budgets"}
+                report={location.pathname === "/reports"}
+              />
+            )}
             <Routes>
               <Route element={<DashboardPage />} path="/" />
               <Route element={<TransactionsPage />} path="/transactions" />

@@ -6,7 +6,7 @@ import { loadPreferences, subscribeToPreferences } from "../features/settings/pr
 import { formatMoney } from "../utils/money.js";
 import { Notice } from "./ui.jsx";
 
-function WorkspaceSnapshot() {
+function WorkspaceSnapshot({ compact = false, report = false }) {
   const [preferences, setPreferences] = useState(loadPreferences);
   const range = { ...getCurrentMonthRange(preferences.timezone), timezone: preferences.timezone };
   const query = useQuery({
@@ -31,22 +31,54 @@ function WorkspaceSnapshot() {
     netCashFlowMinor: 0,
     transactionCount: 0,
   };
+  const currencySummary = (query.data?.summary ?? []).filter(
+    (item) => item.currency === preferences.currency,
+  );
+  const incomeCount = currencySummary.find((item) => item.type === "income")?.transactionCount ?? 0;
+  const expenseCount = currencySummary.find((item) => item.type === "expense")?.transactionCount ?? 0;
   const cards = [
-    { label: "Income this month", value: summary.incomeMinor },
-    { label: "Expenses this month", value: summary.expensesMinor },
-    { label: "Net cash flow", value: summary.netCashFlowMinor },
-    { label: "Transactions", value: summary.transactionCount, count: true },
+    { detail: `${incomeCount} income transactions`, icon: "↗", label: "Income", tone: "metric-teal", value: formatMoney(summary.incomeMinor, preferences.currency) },
+    { detail: `${expenseCount} expense transactions`, icon: "↓", label: "Expenses", tone: "metric-red", value: formatMoney(summary.expensesMinor, preferences.currency) },
+    {
+      detail: summary.netCashFlowMinor < 0 ? "Spending exceeded income" : "Income less expenses",
+      icon: "⌁",
+      label: "Net cash flow",
+      tone: summary.netCashFlowMinor < 0 ? "metric-red" : "metric-teal",
+      value: formatMoney(summary.netCashFlowMinor, preferences.currency),
+    },
+    { detail: "This month", icon: "#", label: "Transactions", tone: "metric-blue", value: summary.transactionCount },
   ];
+  const visibleCards = compact
+    ? cards.filter(({ label }) => label === "Net cash flow" || label === "Transactions")
+    : cards;
 
   return (
-    <section aria-label={`Current month financial snapshot in ${preferences.currency}`} className="workspace-snapshot">
-      {cards.map(({ label, value, count }) => (
-        <article className="workspace-snapshot-card" key={label}>
-          <span>{label}</span>
-          <strong>{query.isPending ? "—" : count ? value : formatMoney(value, preferences.currency)}</strong>
-        </article>
+    <section
+      aria-label={`Current month financial snapshot in ${preferences.currency}`}
+      className={`workspace-snapshot${compact ? " workspace-snapshot--summary" : ""}${report ? " workspace-snapshot--report" : ""}`}
+    >
+      {visibleCards.map(({ detail, icon, label, tone, value }) => (
+        <SnapshotSummaryCard
+          detail={detail}
+          icon={icon}
+          key={label}
+          label={label}
+          tone={tone}
+          value={query.isPending ? "—" : value}
+        />
       ))}
     </section>
+  );
+}
+
+function SnapshotSummaryCard({ detail, icon, label, tone, value }) {
+  return (
+    <article className={`metric-card summary-card--tall workspace-snapshot-summary-card ${tone}`}>
+      <span aria-hidden="true" className="metric-icon">{icon}</span>
+      <h2>{label}</h2>
+      <p className="metric-value">{value}</p>
+      <p className="metric-detail">{detail}</p>
+    </article>
   );
 }
 
