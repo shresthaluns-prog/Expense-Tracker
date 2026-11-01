@@ -124,7 +124,7 @@ function AuthPage() {
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-600">
-        {isRegistering ? "Already have an account?" : "New to Expense Tracker?"}{" "}
+        {isRegistering ? "Already have an account?" : "New to Pockii?"}{" "}
         <button className="auth-toggle font-medium text-indigo-700 hover:underline" onClick={toggleMode} type="button">
           {isRegistering ? "Sign in" : "Create an account"}
         </button>

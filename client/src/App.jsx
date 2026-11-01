@@ -54,7 +54,7 @@ function App() {
       <div className="auth-canvas">
         <div className="auth-brand">
           <BrandMark />
-          <span>FinEdge</span>
+          <span>Pockii</span>
         </div>
         <main className="auth-content">
           <Routes>
@@ -80,7 +80,7 @@ function App() {
         <aside aria-label="Sidebar" className={`app-sidebar ${mobileMenuOpen ? "is-open" : ""}`}>
           <div className="sidebar-brand">
             <BrandMark />
-            <span>FinEdge</span>
+            <span>Pockii</span>
             <button
               aria-label="Close navigation"
               className="mobile-menu-close"
@@ -195,8 +195,8 @@ function BrandMark() {
   return (
     <span aria-hidden="true" className="brand-mark">
       <svg fill="none" viewBox="0 0 32 32">
-        <path d="M7 8.5c0-2.2 1.8-4 4-4h14v5H12a1 1 0 0 0-1 1v2h10v5H11v8H6v-8a5 5 0 0 1 5-5h10v-3H11a4 4 0 0 1-4-4Z" fill="currentColor" />
-        <path d="M6 22.5a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z" fill="currentColor" />
+        <circle cx="16" cy="16" r="12" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M19.5 11.5c-.7-1-2-1.5-3.5-1.5-2 0-3.5 1-3.5 2.5s1.2 2.2 3.5 2.5 3.5 1.1 3.5 2.5-1.5 2.5-3.5 2.5c-1.6 0-3-.6-3.8-1.7M16 8.5v15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
       </svg>
     </span>
   );
